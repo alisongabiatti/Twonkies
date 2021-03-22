@@ -1,2 +1,2 @@
-# chaosAPI
-API para teste de chaos
+# ChaosAPI
+API para experimento de chaos
