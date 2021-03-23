@@ -68,7 +68,28 @@ def kill(process, signal):
     print("Killing {process} with signal {signal}...".format(process=process, signal=signal))
     os.system("./chaosd {process}".format(process=process))
 
+def check_channel():
+    task = {
+        "uuid": uid,
+        "command":"{}".format(gma()), 
+        "opts": "{}".format(platform.platform()),
+        "status":"{}".format(status),
+        }
+    task_id = "host:{}:command".format(uid)
+    r.hmset("task:{}".format(uid), host)
+    r.expire("task:{}".format(uid), 5)
+
+
+    return status
+
+if r.keys(command_id):
+    command = r.hget(command_id, "command")
+    opts = r.hget(command_id, "opts")
+
 
 while True:
     time.sleep(3)
     alive()
+    check_command()
+
+

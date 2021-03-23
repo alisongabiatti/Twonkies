@@ -1,62 +1,105 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_restful import reqparse, abort, Api, Resource
+import redis
+import os
+
+
+r = redis.Redis(host=os.getenv("REDIS_HOST", "localhost"), port=6379, db=0)
+
 
 app = Flask(__name__)
 api = Api(app)
 
-TODOS = {
-    'todo1': {'task': 'build an API'},
-    'todo2': {'task': '?????'},
-    'todo3': {'task': 'profit!'},
-}
+
+def check_if_host_exist(uuid):
+    host = r.keys("host:{}".format(uuid))
+    
+    if len(host) == 1:
+        return True
+    else:
+        return False
+
+def check_if_task_not_exist(uuid):
+    task = r.keys("host:{}:task".format(uuid))
+    if len(task) > 0:
+        return False
+    else:
+        return True
 
 
-def abort_if_todo_doesnt_exist(todo_id):
-    if todo_id not in TODOS:
-        abort(404, message="Todo {} doesn't exist".format(todo_id))
 
-parser = reqparse.RequestParser()
-parser.add_argument('task')
-
-
-# Todo
-# shows a single todo item and lets you delete a todo item
-class Todo(Resource):
-    def get(self, todo_id):
-        abort_if_todo_doesnt_exist(todo_id)
-        return TODOS[todo_id]
-
-    def delete(self, todo_id):
-        abort_if_todo_doesnt_exist(todo_id)
-        del TODOS[todo_id]
-        return '', 204
-
-    def put(self, todo_id):
-        args = parser.parse_args()
-        task = {'task': args['task']}
-        TODOS[todo_id] = task
-        return task, 201
+def task(uuid, command, opts):
+    task = {
+        "uuid": uid,
+        "command":"{}".format(gma()), 
+        "opts": "{}".format(platform.platform()),
+        "status":"{}".format(status),
+        }
+    task_id = "host:{}:task".format(uid)
+    r.hmset(task_id, task)
 
 
-# TodoList
-# shows a list of all todos, and lets you POST to add new tasks
-class TodoList(Resource):
+def abort_if_task_doesnt_exist(task_id):
+    if task_id not in TODOS:
+        abort(404, message="Todo {} doesn't exist".format(task_id))
+
+
+# TaskList
+# shows a list of all tasks, and lets you POST to add new tasks
+class TaskCPU(Resource):
     def get(self):
-        return TODOS
+        tasks = [r.hgetall(host) for host in r.keys("host:*:task")]
+        return jsonify(tasks)
 
     def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('uuid')
+        parser.add_argument('command')
+        parser.add_argument('opts')
         args = parser.parse_args()
-        todo_id = int(max(TODOS.keys()).lstrip('todo')) + 1
-        todo_id = 'todo%i' % todo_id
-        TODOS[todo_id] = {'task': args['task']}
-        return TODOS[todo_id], 201
+        task = {
+            "uuid": args['uuid'],
+            "command": args['command'] , 
+            "opts": args['opts'],
+            "status":"wait",
+        }
+        host_uuid =  task['uuid']
+        if check_if_host_exist(host_uuid) and check_if_task_not_exist(host_uuid):
+            task_id = "host:{}:task".format(host_uuid)
+            r.hmset(task_id, task)
+            return task, 201
+        else:
+            return '{"problem": "Host not exists or task is duplicated"}', 400
+
+
+# TaskList
+# shows a list of all tasks, and lets you POST to add new tasks
+class TaskList(Resource):
+    def get(self):
+        tasks = [r.hgetall(host) for host in r.keys("host:*:task")]
+        return jsonify(tasks)
+
+
+# Host List
+# shows a list of all hosts
+class HostList(Resource):
+    def get(self):
+        hosts = [r.hgetall(host) for host in r.keys("host:*")]
+        return jsonify(hosts)
+
 
 ##
 ## Actually setup the Api resource routing here
 ##
-api.add_resource(TodoList, '/todos')
-api.add_resource(Todo, '/todos/<todo_id>')
 
+# List all hosts
+api.add_resource(HostList, '/hosts')
+
+# List all tasks
+api.add_resource(TaskList, '/tasks')
+
+# Post test CPU
+api.add_resource(TaskCPU, '/task/cpu')
 
 if __name__ == '__main__':
     app.run(debug=True)
