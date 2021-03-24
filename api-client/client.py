@@ -8,6 +8,7 @@ import subprocess
 import platform
 from uuid import getnode as gma
 from uuid import uuid4
+import logging
 
 '''
 bin/chaosd attack process 
@@ -22,7 +23,9 @@ bin/chaosd attack cpu
  subprocess.call(cmd, shell=True)
 '''
 
-r = redis.Redis(host=os.getenv("REDIS_HOST", "localhost"), port=6379, db=0)
+CHAOSD_PATH=os.getenv("CHAOSD_PATH", "bin/chaosd")
+
+r = redis.from_url(url=os.getenv("DBAAS_REDIS_ENDPOINT", "redis://localhost:6379/0"), charset="utf-8", decode_responses=True)
 
 
 # Get hostname
@@ -64,32 +67,72 @@ def alive():
 def stop(process):
     pass
 
-def kill(process, signal):
+def set_as_busy(uid, timer):
+    r.hset('host:{}'.format(uid), 'status', 'busy')
+    r.expire('host:{}'.format(uid), timer)
+
+def set_task_as_executing(task):
+    r.hset(task, 'status', 'executing')
+
+def killAttackChaosd(process, signal):
     print("Killing {process} with signal {signal}...".format(process=process, signal=signal))
-    os.system("./chaosd {process}".format(process=process))
+    set_task_as_executing(task)
+    os.system("./{} attack process kill -p {} -s {} ".format(CHAOSD_PATH, process, signal))
+    r.delete(task)
+
+def cpuAttackChaosD(workers, load):
+    print("CPU Attack with {workers} 5 workers and {load}\% load...".format(workers=workers, load=load))
+    set_task_as_executing(task)
+    os.system("./{} attack cpu -l {load} -w {workers}".format(CHAOSD_PATH, workers=workers, load=load))
+    r.delete(task)
+
+def cpuAttack(core, load,timer, task):
+    print("CPU Attack  {core} core(s) and {load}\% load...".format(core=core, load=load))
+    set_task_as_executing(task)
+    os.system("stress-ng -c {core} -l {load} -t {timer}".format(CHAOSD_PATH, core=core, load=load, timer=timer))
+    r.delete(task)
+
+def memoryAttack(core, load,timer, task):
+    print("Memory Attack with {core} core(s) and {load}\% load...".format(core=core, load=load))
+    set_task_as_executing(task)
+    os.system("stress-ng -vm {core} --vm-bytes {load} -t {timer}".format(CHAOSD_PATH, core=core, load=load, timer=timer))
+    r.delete(task)
 
 def check_channel():
-    task = {
-        "uuid": uid,
-        "command":"{}".format(gma()), 
-        "opts": "{}".format(platform.platform()),
-        "status":"{}".format(status),
-        }
-    task_id = "host:{}:command".format(uid)
-    r.hmset("task:{}".format(uid), host)
-    r.expire("task:{}".format(uid), 5)
-
-
-    return status
-
-if r.keys(command_id):
-    command = r.hget(command_id, "command")
-    opts = r.hget(command_id, "opts")
+    # task = {
+    #     "uuid": uid,
+    #     "command":"{}".format(gma()), 
+    #     "opts": "{}".format(platform.platform()),
+    #     "status":"{}".format(status),
+    #     }
+    tasks_list = 'task:{}'.format(uid)
+    tasks = [r.hgetall(host) for host in r.keys(tasks_list)]
+    for task in tasks:
+        command = r.hget(tasks_list, 'command')
+        if command == 'kill':
+            process = r.hget(tasks_list, 'process')
+            signal = r.hget(tasks_list, 'signal') or 'term'
+            killAttack(process, signal)
+        elif command == 'cpu':
+            core = r.hget(tasks_list, 'core')
+            load = r.hget(tasks_list, 'load')
+            timer = r.hget(tasks_list, 'timer')
+            set_as_busy(uid, timer)
+            cpuAttack(core, load,timer, tasks_list)
+        elif command == 'memory':
+            core = r.hget(tasks_list, 'core')
+            load = r.hget(tasks_list, 'load')
+            timer = r.hget(tasks_list, 'timer')
+            set_as_busy(uid, timer)
+            memoryAttack(core, load,timer, tasks_list)
+        else:
+            logging.warning("Command not found")
+            r.delete(tasks_list)
 
 
 while True:
     time.sleep(3)
     alive()
-    check_command()
+    check_channel()
 
 

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chaos API interface</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    </head>
+    <body style="background-color: #131313e9">
+        <header>
+                <div class="collapse bg-dark" id="navbarHeader">
+                  <div class="container">
+                    <div class="row">
+                      <div class="col-sm-8 col-md-7 py-4">
+                        <h4 class="text-white">Sobre</h4>
+                        <p class="text-muted">ChaOS API Interface - Interface para ChaosAPI</p>
+                      </div>
+                      <div class="col-sm-4 offset-md-1 py-4">
+                        <h4 class="text-white">Links</h4>
+                        <ul class="list-unstyled">
+                          <li><a href="/#" class="text-white">Doc</a></li>
+                          <li><a href="/#" class="text-white">Github</a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="navbar navbar-dark bg-dark box-shadow">
+                  <div class="container d-flex justify-content-between">
+                    <a href="#" class="navbar-brand d-flex align-items-center">
+                    <svg height="40px" viewBox="0 -80 497.552 497" width="80px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><linearGradient id="a" gradientUnits="userSpaceOnUse" x1="248.776" x2="248.776" y1="336.276" y2=".276"><stop offset="0" stop-color="#9f2fff"/><stop offset="1" stop-color="#0bb1d3"/></linearGradient><path d="m248.777344 288.277344c66.167968 0 120-53.832032 120-120 0-66.167969-53.832032-120-120-120-66.167969 0-120 53.832031-120 120 0 66.167968 53.832031 120 120 120zm0-224c57.34375 0 104 46.65625 104 104s-46.65625 104-104 104-104-46.65625-104-104 46.65625-104 104-104zm0 176c39.695312 0 72-32.296875 72-72 0-39.707032-32.304688-72-72-72-39.699219 0-72 32.292968-72 72 0 39.703125 32.300781 72 72 72zm0-128c30.878906 0 56 25.125 56 56 0 30.871094-25.121094 56-56 56-30.882813 0-56-25.128906-56-56 0-30.875 25.117187-56 56-56zm-40 56c0-22.058594 17.941406-40 40-40 22.054687 0 40 17.941406 40 40h-16c0-13.234375-10.769532-24-24-24-13.234375 0-24 10.765625-24 24 0 13.230468 10.765625 24 24 24v16c-22.058594 0-40-17.945313-40-40zm40-168c-105.203125 0-201.074219 61.984375-244.242188 157.917968l-4.535156 10.082032 4.535156 10.078125c43.167969 95.9375 139.039063 157.921875 244.242188 157.921875 105.199218 0 201.070312-61.984375 244.238281-157.921875l4.535156-10.078125-4.535156-10.082032c-43.167969-95.933593-139.039063-157.917968-244.238281-157.917968zm152 168c0 83.816406-68.183594 152-152 152s-152-68.183594-152-152 68.183594-152 152-152 152 68.183594 152 152zm-381.648438 3.511718-1.578125-3.511718 1.585938-3.511719c24.558593-54.59375 67.34375-97.378906 119.175781-122.738281-35.183594 30.816406-57.535156 75.921875-57.535156 126.25s22.351562 95.429687 57.527344 126.253906c-51.824219-25.367188-94.609376-68.144531-119.175782-122.742188zm459.296875 0c-24.5625 54.589844-67.347656 97.375-119.179687 122.734376 35.179687-30.816407 57.53125-75.917969 57.53125-126.246094s-22.351563-95.433594-57.53125-126.257813c51.824218 25.359375 94.609375 68.144531 119.179687 122.738281l1.574219 3.519532zm0 0" fill="url(#a)"/></svg>
+                      <strong>Chaos API</strong>
+                    </a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+                      <span class="navbar-toggler-icon"></span>
+                    </button>
+                  </div>
+                </div>
+              </header>
+        <div class="container">
+            <h1 class="text-muted">ChaosAPI</h1>
+            <button type="button" class="btn btn-primary" id="hosts">Hosts</button>
+            <button type="button" class="btn btn-primary" id="tasks">Tasks</button>
+            <!-- <button type="button" class="btn btn-primary" id="Create">Create</button>
+            <button type="button" class="btn btn-success" id="populate">Populate</button> -->
+        <br />
+        <div class="table-responsive">
+            <br />
+            <table class="table table-bordered table-striped table-dark" id="api_table">
+            </table>
+        </div>
+        </div>
+         <!-- Loading para obtenção dos dados do ChaosAPI -->
+         <div class="modal fade bd-example-modal-lg" data-backdrop="static" data-keyboard="false" tabindex="-1">
+             <div class="modal-dialog modal-sm" >
+                    <div class="spinner-border text-info" role="status"></div>
+                    <br />
+                    <br />
+                        <h3 class="text-info">Obtendo os dados do ChaosAPI, aguarde...</h3>
+                 </div>
+             </div>
+         </div>
+         <!-- Fim do modal com loading         -->
+      </body>
+      <script>
+        $(document).ready(function(){
+            // Retorna a lista de hosts
+            $('#hosts').click(function(){
+            $("#api_table > tr").remove();
+            $.getJSON("http://{{url}}/hosts", function(data){
+                var api_data = '';
+                $.each(data, function(key, value){
+                    api_data += '<tr>';
+                    api_data += '<td>'+value.hostname+'</td>';
+                    api_data += '<td>'+value.uuid+'</td>';
+                    api_data += '<td>'+value.platform+'</td>';
+                    api_data += '<td>'+value.status+'</td>';
+                    api_data += '<tr>';
+                });
+                titulo = '<tr>';
+                    titulo += '<th>Hostname</th>';
+                    titulo += '<th>UID</th>';
+                    titulo += '<th>Platform</th>';
+                    titulo += '<th>Status</th>';
+                    titulo += '</tr>';
+                $('#api_table').append(titulo + api_data);
+                });
+            });
+            // Retorna a lista de tasks
+            $('#tasks').click(function(){
+                $("#api_table > tr").remove();
+                $.getJSON("http://{{url}}/tasks", function(data){
+                    var api_data = '';
+                    $.each(data, function(key, value){
+                        api_data += '<tr>';
+                        api_data += '<td>'+value.uuid+'</td>';
+                        api_data += '<td>'+value.command+'</td>';
+                        api_data += '<td>'+value.status+'</td>';
+                        api_data += '<tr>';
+                    });
+                    titulo = '<tr>';
+                        titulo += '<th>Host</th>';
+                        titulo += '<th>Task</th>';
+                        titulo += '<th>Status</th>';
+                        titulo += '</tr>';
+                    $('#api_table').append(titulo + api_data);
+                    });
+                });
+                // Lista criados
+                $('#create').click(function(){
+                    $("#api_table > tr").remove();
+                    $.getJSON("http://{{url}}/create", function(data){
+                        var api_data = '';
+                        $.each(data, function(key, value){
+                            api_data += '<tr>';
+                            api_data += '<td>'+value.uuid+'</td>';
+                            api_data += '<td>'+value.host+'</td>';
+                            api_data += '<tr>';
+                        });
+                        titulo = '<tr>';
+                            titulo += '<th>uuid</th>';
+                            titulo += '<th>host</th>';
+                            titulo += '</tr>';
+                        $('#api_table').append(titulo + api_data);
+                        });
+                    });
+        });
+          
+        </script>
+</html>
