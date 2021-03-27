@@ -1,7 +1,9 @@
 package host
 
 import (
-	"reflect"
+	"context"
+	"encoding/json"
+
 	"github.com/alisongabiatti/Twonkies/src/internals/rds"
 )
 
@@ -13,41 +15,17 @@ type Host struct {
 	Status   string `json:"status"`
 }
 
-func structToMap(item interface{}) map[string]interface{} {
+func (h Host) Register(ctx context.Context) {
 
-	res := map[string]interface{}{}
-	if item == nil {
-		return res
+	host, err := json.Marshal(h)
+	if err != nil {
+		print(err)
 	}
-	v := reflect.TypeOf(item)
-	reflectValue := reflect.ValueOf(item)
-	reflectValue = reflect.Indirect(reflectValue)
+	rds.Redis.HSet(ctx, "host", h.Uid, string(host))
 
-	if v.Kind() == reflect.Ptr {
-		v = v.Elem()
-	}
-	for i := 0; i < v.NumField(); i++ {
-		tag := v.Field(i).Tag.Get("json")
-		field := reflectValue.Field(i).Interface()
-		if tag != "" && tag != "-" {
-			if v.Field(i).Type.Kind() == reflect.Struct {
-				res[tag] = structToMap(field)
-			} else {
-				res[tag] = field
-			}
-		}
-	}
-	return res
 }
 
-func (h Host) Register() {
-	hostTag := "host:" + h.Uid
-	host := structToMap(h)
-	host["status"]="created"
-	rds.RClient().HSet(rds.Ctx, hostTag, host)
-}
-
-func (h Host) Pong() {
-	hostTag := "host:" + h.Uid
-	rds.RClient().HSet(rds.Ctx, hostTag, "status", h.Status)
-}
+// func (h Host) Pong(ctx context.Context) {
+// 	hostTag := "host:" + h.Uid
+// 	rds.Redis.Set(ctx, hostTag, "status", h.Status)
+// }
